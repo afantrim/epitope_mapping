@@ -1,0 +1,18 @@
+Code used for extracting ASA data. 
+
+To get ASA data follow these steps:
+1. Go to http://www.abren.net/asaview/
+2. Graphical results are displayed with a link to download "relative ASA values (%)" as a text file.
+3. Parse this text file in ASAParser python code as shown below: 
+
+The relative ASA values are stored in variable SA[i] where i is the residue number (zero indexed). Residues with 5% or more ASA value could be classified as surface accessible.
+
+Usage:
+
+from ASAParser import *
+asa = ASAParse("example_ASA_data.txt")
+print asa.SA[10]
+print asa.SA[12]
+
+
+

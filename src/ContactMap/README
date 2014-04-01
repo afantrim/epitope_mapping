@@ -1,0 +1,13 @@
+Code used for extracting Contact map data from a PDB file. 
+
+The distance in Angstroms between each residue pair is stored in dictionary self.Distances[i,j] where i and j are residue numbers (zero indexed).
+
+Usage:
+
+from PDBParser import *
+pdb = PDBParse("example_PDB_data.pdb")
+print pdb.Distances[10,15]
+print pdb.Distances[12,23]
+
+
+
