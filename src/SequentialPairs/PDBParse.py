@@ -19,11 +19,10 @@ Contents:
 	self.Pairs = contact pairs from the contact map and structure info
 	self.Distance = distances between the above contact pairs
 
-Warning: Only works on a single chain of the protein. A discontinuous protein warning
-often suggests that the protein in question has multiple chains. 
+
 '''
 class PDBParse:
-    def __init__(self, File):
+    def __init__(self, File, cutoff):
     	self.file = File
         self.Coord = []
         ResNumList =[]
@@ -47,7 +46,6 @@ class PDBParse:
         self.StartingResidue = self.seq[0]
 
 		#get contact pairs
-        cutoff = 25
         self.ContactMap = []
         self.DistanceMap = []
         self.NamePairs = []
@@ -90,15 +88,3 @@ class PDBParse:
     	        	if residue1.get_resname() in AAConverter.keys() and residue2.get_resname() in AAConverter.keys():
 	    	        	self.NamePairs.append((AAConverter[residue1.get_resname()], AAConverter[residue2.get_resname()]))
     	        			
-
-		
-
-'''Parse and represent a single line in a PDB file'''
-class LineParse:
-    def __init__(self, line):
-        self.AtomName = line[12:16].strip()
-        self.ResName = line[17:20].strip()
-        self.ResNum = int(line[22:26])
-        self.X = float(line[30:38])
-        self.Y = float(line[38:46])
-        self.Z = float(line[46:54])

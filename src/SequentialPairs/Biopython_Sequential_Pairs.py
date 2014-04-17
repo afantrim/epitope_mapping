@@ -1,5 +1,23 @@
 #!/Users/ameliaantrim/anaconda/bin/python
 
+'''
+Readme: 
+
+Inputs: 
+(1) peptide_file: A file containing the peptide binding dataset, with each individual
+    peptide separated by a newline character
+(2) asa_file:
+
+Functions:
+(1) make_pairs(self): 
+
+Class attributes:
+(1) self.sequence_file: PDB file containing structure
+(2) self.asa_file: ASA file containing accessible surface area
+(3) self.peptide_file:  
+ 
+'''
+
 import sys
 import math
 import os
@@ -51,19 +69,7 @@ class SequentialPairs:
 				if pair in sequential_pairs.keys():
 					sequential_pairs[pair] += 1
 				else:
-					sequential_pairs[pair] = 1
-					
-				#now add in the first pair
-				if peptide[i] in self.valued_spheres.keys():
-					self.valued_spheres[peptide[i]] += 1
-				else:
-					self.valued_spheres[peptide[i]] = 1
-				
-				#then add the second pair
-				if peptide[i+1] in self.valued_spheres.keys():
-					self.valued_spheres[peptide[i+1]] += 1
-				else:
-					self.valued_spheres[peptide[i+1]] = 1
+					sequential_pairs[pair] = 1	
 		return sequential_pairs
 	
 	'''Takes a sequence pair object and maps the surface residues to the number of

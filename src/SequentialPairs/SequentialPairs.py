@@ -1,5 +1,19 @@
 #!/Users/ameliaantrim/anaconda/bin/python
 
+'''
+Represents a set of sequential pairs of amino acids derived from a set of peptides.
+
+Inputs:
+(1) peptide_file: File containing peptides observed to bind the antibody; separated by
+    a newline character
+(2) reduced: A boolean indicating whether to use the reduced amino acid alphabet
+
+Outputs:
+(1) self.pair_dict: Dictionary containing the amino acid pairs in the peptide dataset
+    and the number of times each pair appears in the peptide dataset
+
+'''
+
 import sys
 import math
 import os
@@ -7,21 +21,18 @@ from collections import defaultdict
 from ASAParse import ASAParse
 from SubGroups import SubGroups
 
-'''Represents a set of sequential pairs of amino acids derived from a set of peptide
-binding data, maps them to the surface pairs of the antibody'''
+'''
+Represents a set of sequential pairs of amino acids derived from a set of peptide
+binding data, maps them to the surface pairs of the antigen
+'''
 class SequentialPairs:
-	def __init__(self, peptide_file, asa_file, sequence_file, reduced):
-		self.sequence_file = sequence_file
-		self.asa_file = asa_file
+	def __init__(self, peptide_file, reduced):
 		self.peptide_file = peptide_file
 		with open(peptide_file, "r") as file:
 			self.peptides = file.read().split('\n')
-		self.surface_residues = ASAParse(self.asa_file).SA_dict
-		#self.reduced_surface = SubGroups(self.surface_residues).reduced_string
-		self.valued_spheres = defaultdict(int) # to be filled in in make_pairs()
+		
+		# Convert the amino acid alphabet to the reduced alphabet if desired
 		if reduced:
-			print "SURFACE RESIDUES: \n"
-			print self.surface_residues
 			temp = self.peptides
 			self.peptides = []
 			for peptide in temp:
@@ -33,7 +44,6 @@ class SequentialPairs:
 	'''Takes a set of peptides and breaks it down into a set of sequential pairs'''
 	def make_pairs(self):
 		sequential_pairs = defaultdict(int) #so that all values initialize to 0
-		
 		# Scan through all the peptides in the docuemtns
 		for peptide in self.peptides:
 			for i in range(0, len(peptide)-1):
@@ -43,22 +53,12 @@ class SequentialPairs:
 					sequential_pairs[pair] += 1
 				else:
 					sequential_pairs[pair] = 1
-					
-				#now add in the first pair
-				if peptide[i] in self.valued_spheres.keys():
-					self.valued_spheres[peptide[i]] += 1
-				else:
-					self.valued_spheres[peptide[i]] = 1
-				
-				#then add the second pair
-				if peptide[i+1] in self.valued_spheres.keys():
-					self.valued_spheres[peptide[i+1]] += 1
-				else:
-					self.valued_spheres[peptide[i+1]] = 1
 		return sequential_pairs
 	
-	'''Takes a sequence pair object and maps the surface residues to the number of
-	times they appear in the sequential peptide pairs'''
+	'''
+	Takes a sequence pair object and maps the surface residues to the number of
+	times they appear in the sequential peptide pairs
+	'''
 	def value_pairs(self):
 		pair_values = defaultdict(int)
 		for pair in self.pair_dict.keys():
