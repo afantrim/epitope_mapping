@@ -1,27 +1,11 @@
-#!/Users/ameliaantrim/anaconda/bin/python
+#!/Users/student/anaconda/bin/python
 
 '''
-Driver class in which I can enter files and parameters.
+.. module:: Driver
+   :platform: Unix, Windows
+   :synopsis: A sample driver class to analyze an epitope. 
 
-Pipeline:
-(1) Checks validity of inputs
-(2) Calls SequentialPairs to turn the peptides into a dictionary of pairs with the
-    values being the number of times that pair appears in the peptide dataset.
-    **check in on valued spheres***
-(3) Calls PyMolColor to generate two PyMol batch files to color both the lines and 
-    the spheres
-    ***check spheres***
-(4) Generates real contact pairs if that information is available
-    ***maybe think about making this a separate script
-
-To do: 
-- Make a list of the real positives
-- Make a list of the predicted positives
-- Add to the script functionality to calculate the true and false positives
-- Fix the reduce function
-- Decide between PDBParse/Biopython contact pairs and remove the other 
-- Ditto w/ Biopython_sequential_pairs and PDBParse (probably delete PDBParse and then
-    rename Biopython_sequntial_pairs to PDBParse because this is a more logical name
+.. moduleauthor:: Amelia F. Antrim <amelia.f.antrim@gmail.com>
 
 '''
 
@@ -30,14 +14,17 @@ import sys
 import math
 import os
 from ASAParse import ASAParse
-from BioPythonContactPairs import PDBParse
+from PDBParse import PDBParse
 from SequentialPairs import SequentialPairs
 from SubGroups import SubGroups
-from PyMolColor import PyMolColor
+#from PyMolColor import PyMolColor
 from Bio.PDB import *
 from PyMolColorSpheres import ColorResidues
 from Statistics import Statistics
 from PrecisionRecall import PrecisionRecall
+from PDBUtil import PDBUtil
+import numpy
+from TestThreshhold import TestThreshhold
 
 
 '''Check whether a file exists and can be opened'''
@@ -74,7 +61,8 @@ def main():
         else:
             print "Exiting. Re-try with new input (see README).\n"
             exit(0)
-    cutoff = 17
+            
+    cutoff = 12.0
     
     # Create the antibody/peptide model and color the pairs in pymol
     if not check_file(asa_file) and check_file(peptide_file) and check_file(sequence_file):
@@ -85,32 +73,36 @@ def main():
     model = SequentialPairs(peptide_file, reduced)
 
     # Get a dictionary representation of the surface area
-    asa_dict = ASAParse(asa_file).SA_dict
-
+    antigen_asa_dict = ASAParse(asa_file).SA_dict
+    
     # Parse the PDB file to get antigen structural and sequence information 
-    pdb_info = PDBParse(sequence_file, cutoff)
+    pdb_info = PDBParse(sequence_file, cutoff, antigen_asa_dict)
+    pdb_info.make_pairs()
 
     # Make a PyMOL batch file to color the residues according to whether they 
     # are estimated to be part of the epitope
-    spheres = ColorResidues(model.pair_dict, sequence_file, pdb_info, asa_dict, reduced)
+    spheres = ColorResidues(model.pair_dict, sequence_file, pdb_info, antigen_asa_dict, reduced)
     spheres.create_residues_file()
 
     # Get information for co-crystallized structure
-    #antibody_asa_file = raw_input("Enter the antibody ASA file: ")
-    #antibody_pdb_file = raw_input("Enter the antibody PDB file: ")
-    #co_pdb_file = raw_input("Enter co-crystallized PDB file: ")
     antibody_asa_file = sys.argv[5]
     antibody_pdb_file = sys.argv[6]
     co_pdb_file = sys.argv[7]
-
+    
+    # Get the accessible surface area of the antibody
+    antibody_asa_dict = ASAParse(antibody_asa_file).SA_dict
+    
     # Model the antibody and the antigen in co-crystallized form 
-    contact_pairs = PDBParse(co_pdb_file, cutoff).ContactPairs
+    contact_structure = PDBParse(co_pdb_file, asa_dict=antibody_asa_dict)
+    
+    # The first structure in the model (there is only one, but the organization of the PDB requires this)
+    contact_model = contact_structure.structure
 
+    # Make the plots
+    TestThreshhold.make_plot(spheres.residues, contact_model, contact_model["C"], dist=12.0)
+    
     # Then make a CSV file to compare the false and true positives
-    positives = Statistics(spheres.positives, contact_pairs)
-
-    plot = PrecisionRecall()
-    plot.add_threshhold(positives.true_positives, positives.false_positives)
+    #positives = Statistics(spheres.positives, contact_pairs)
     
 if __name__ == "__main__":
     main()

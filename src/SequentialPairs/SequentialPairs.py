@@ -1,16 +1,11 @@
-#!/Users/ameliaantrim/anaconda/bin/python
+#!/Users/student/anaconda/bin/python
 
 '''
-Represents a set of sequential pairs of amino acids derived from a set of peptides.
+.. module:: SequentialPairs
+   :platform: Unix, Windows
+   :synopsis: Deals with peptide binding datasets and the sequential subsets thereof. 
 
-Inputs:
-(1) peptide_file: File containing peptides observed to bind the antibody; separated by
-    a newline character
-(2) reduced: A boolean indicating whether to use the reduced amino acid alphabet
-
-Outputs:
-(1) self.pair_dict: Dictionary containing the amino acid pairs in the peptide dataset
-    and the number of times each pair appears in the peptide dataset
+.. moduleauthor:: Amelia F. Antrim <amelia.f.antrim@gmail.com>
 
 '''
 
@@ -26,6 +21,18 @@ Represents a set of sequential pairs of amino acids derived from a set of peptid
 binding data, maps them to the surface pairs of the antigen
 '''
 class SequentialPairs:
+	
+	'''  
+    .. function:: __init__(self, peptide_file, reduced)
+    
+    Represents a set of reduced or non-reduced pairs in the peptide dataset 
+
+    :param peptide_file: File containing list of peptides observed to bind antibody, separated by newline characters.
+    :type peptide_file: str (filename)
+    :param reduced: Boolean indicating whether or not to reduce the amino acid alphabet.
+    :type reduced: boolean or integer (0=False, 1=True)
+   
+    '''
 	def __init__(self, peptide_file, reduced):
 		self.peptide_file = peptide_file
 		with open(peptide_file, "r") as file:
@@ -37,12 +44,15 @@ class SequentialPairs:
 			self.peptides = []
 			for peptide in temp:
 				self.peptides.append(SubGroups.str_reduce(peptide))
-			print "hi"
-			#self.peptides = SubGroups.reduce(self.peptides)
-		self.pair_dict = self.make_pairs()
+		
+		# Make pairs
+		self.pair_dict = self._make_pairs()
 	
-	'''Takes a set of peptides and breaks it down into a set of sequential pairs'''
-	def make_pairs(self):
+	
+	def _make_pairs(self):
+		'''Takes a set of peptides and breaks it down into a set of sequential pairs.
+
+    	'''
 		sequential_pairs = defaultdict(int) #so that all values initialize to 0
 		# Scan through all the peptides in the docuemtns
 		for peptide in self.peptides:
@@ -54,16 +64,4 @@ class SequentialPairs:
 				else:
 					sequential_pairs[pair] = 1
 		return sequential_pairs
-	
-	'''
-	Takes a sequence pair object and maps the surface residues to the number of
-	times they appear in the sequential peptide pairs
-	'''
-	def value_pairs(self):
-		pair_values = defaultdict(int)
-		for pair in self.pair_dict.keys():
-			if pair in self.surface_residues:
-				#for now we are just adding the pairs if multiple contacts come in
-				pair_values[pair] += pair_dict[pair]
-		return pair_values
 		
