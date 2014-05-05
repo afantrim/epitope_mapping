@@ -81,13 +81,13 @@ def main():
 
     # Make a PyMOL batch file to color the residues according to whether they 
     # are estimated to be part of the epitope
-    spheres = ColorResidues(model.pair_dict, sequence_file, pdb_info, antigen_asa_dict, reduced)
+    spheres = ColorResidues(model.pair_dict, sequence_file, pdb_info, antigen_asa_dict)
     spheres.create_residues_file()
 
     # Get information for co-crystallized structure
-    antibody_asa_file = sys.argv[5]
-    antibody_pdb_file = sys.argv[6]
-    co_pdb_file = sys.argv[7]
+    antibody_asa_file = sys.argv[4]
+    antibody_pdb_file = sys.argv[5]
+    co_pdb_file = sys.argv[6]
     
     # Get the accessible surface area of the antibody
     antibody_asa_dict = ASAParse(antibody_asa_file).SA_dict
@@ -99,7 +99,7 @@ def main():
     contact_model = contact_structure.structure
 
     # Make the plots
-    TestThreshhold.make_plot(spheres.residues, contact_model, contact_model["C"], dist=12.0)
+    TestThreshhold.make_plot(spheres.residues, contact_model, contact_model["C"], pdb_info.Pairs, dist=12.0)
     
     # Then make a CSV file to compare the false and true positives
     #positives = Statistics(spheres.positives, contact_pairs)

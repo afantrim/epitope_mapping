@@ -39,11 +39,11 @@ class SequentialPairs:
 			self.peptides = file.read().split('\n')
 		
 		# Convert the amino acid alphabet to the reduced alphabet if desired
-		if reduced:
+		'''if reduced:
 			temp = self.peptides
 			self.peptides = []
 			for peptide in temp:
-				self.peptides.append(SubGroups.str_reduce(peptide))
+				self.peptides.append(SubGroups.str_reduce(peptide))'''
 		
 		# Make pairs
 		self.pair_dict = self._make_pairs()
