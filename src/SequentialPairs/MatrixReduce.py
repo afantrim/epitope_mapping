@@ -14,7 +14,7 @@ import Blosum
 class MatrixReduce:
 	
 	@classmethod
-	def score_pair(cls, true_pair, pair, scoring_matrix):
+	def score_pair(cls, true_pair, pair, scoring_matrix=None):
 		'''
 		Given two pairs of residues, calculates a substitutability
 		index for these pairs given a scoring matrix.
@@ -31,6 +31,8 @@ class MatrixReduce:
 	
 		if scoring_matrix == None:
 			scoring_matrix = Blosum.CSERZO
+		
+		print true_pair
 			
 		# Check both amino acids in the pair against the true pair
 		if pair[0].get_resname() in scoring_matrix[true_pair[0]].keys():
